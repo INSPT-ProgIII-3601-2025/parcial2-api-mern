@@ -1,0 +1,13 @@
+mern-backend/
+│── src/
+│   ├── config/         # Configuración (db, dotenv, passport, etc.)
+│   ├── controllers/    # Lógica de negocio (manejo de requests/responses)
+│   ├── models/         # Modelos de MongoDB (Mongoose schemas)
+│   ├── routes/         # Definición de endpoints
+│   ├── middlewares/    # Autenticación, validaciones, logs, etc.
+│   ├── utils/          # Helpers reutilizables
+│   └── index.js        # Punto de entrada del servidor Express
+│
+├── .env                # Variables de entorno (DB_URI, PORT, JWT_SECRET…)
+├── package.json
+└── README.md
