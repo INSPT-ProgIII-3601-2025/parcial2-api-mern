@@ -1,0 +1,5 @@
+Para comenzar el proyecto
+npm init
+
+Llego a mi casa, clono el proyecto de github y luego voy a la consola y tipeo el siguiente comando: npm install
+Esto reconstruye la carpeta node_modules según lo manifestado en el package.json
