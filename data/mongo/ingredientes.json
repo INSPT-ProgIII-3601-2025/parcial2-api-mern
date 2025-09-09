@@ -1,0 +1,102 @@
+[
+  {
+    "nombre": "Harina de trigo",
+    "foto": "ing_1.jpg",
+    "color": "#FFFFFF"
+  },
+  {
+    "nombre": "Azúcar",
+    "foto": "ing_2.jpg",
+    "color": "#FFC0CB"
+  },
+  {
+    "nombre": "Huevos",
+    "foto": "ing_3.jpg",
+    "color": "#FFD700"
+  },
+  {
+    "nombre": "Leche",
+    "foto": "ing_4.jpg",
+    "color": "#FFFAF0"
+  },
+  {
+    "nombre": "Sal",
+    "foto": "ing_5.jpg",
+    "color": "#ADD8E6"
+  },
+  {
+    "nombre": "Levadura",
+    "foto": "ing_6.jpg",
+    "color": "#BDB76B"
+  },
+  {
+    "nombre": "Aceite de oliva",
+    "foto": "ing_7.jpg",
+    "color": "#808000"
+  },
+  {
+    "nombre": "Tomate",
+    "foto": "ing_8.jpg",
+    "color": "#FF6347"
+  },
+  {
+    "nombre": "Cebolla",
+    "foto": "ing_9.jpg",
+    "color": "#9370DB"
+  },
+  {
+    "nombre": "Pimiento rojo",
+    "foto": "ing_10.jpg",
+    "color": "#FF4500"
+  },
+  {
+    "nombre": "Pimiento verde",
+    "foto": "ing_11.jpg",
+    "color": "#008000"
+  },
+  {
+    "nombre": "Pimiento amarillo",
+    "foto": "ing_12.jpg",
+    "color": "#FFFF00"
+  },
+  {
+    "nombre": "Ajo",
+    "foto": "ing_13.jpg",
+    "color": "#00008B"
+  },
+  {
+    "nombre": "Pasta",
+    "foto": "ing_14.jpg",
+    "color": "#FFE4B5"
+  },
+  {
+    "nombre": "Carne molida",
+    "foto": "ing_15.jpg",
+    "color": "#A52A2A"
+  },
+  {
+    "nombre": "Pollo",
+    "foto": "ing_16.jpg",
+    "color": "#FF5733"
+  },
+  {
+    "nombre": "Queso cheddar",
+    "foto": "ing_17.jpg",
+    "color": "#FFA500"
+  },
+  {
+    "nombre": "Queso parmesano",
+    "foto": "ing_18.jpg",
+    "color": "#F5DEB3"
+  },
+  {
+    "nombre": "Jamón",
+    "foto": "ing_19.jpg",
+    "color": "#FFB6C1"
+  },
+  {
+    "nombre": "Pan",
+    "foto": "ing_20.jpg",
+    "color": "#D2B48C"
+  }
+]
