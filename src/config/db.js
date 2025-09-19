@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect("mongodb://localhost:27017/recetorium");
-    //const conn = await mongoose.connect(process.env.DB_URI);
+    const conn = await mongoose.connect(process.env.DB_URL);
     console.log(`MongoDB conectado: ${conn.connection.host}`);
   } catch (error) {
     console.error("Error al conectar a MongoDB:", error.message);
