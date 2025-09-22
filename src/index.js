@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const recetaRoutes = require("./routes/recetaRoutes");
 const ingredientesRoutes = require("./routes/ingredientesRoutes");
+const usuarioRoutes = require("./routes/usuarioRoutes");
 const connectDB = require("./config/db");
 
 const app = express();
@@ -15,6 +16,7 @@ connectDB();
 // Rutas
 app.use("/api/recetas", recetaRoutes);
 app.use("/api/ingredientes", ingredientesRoutes);
+app.use("/api/usuarios", usuarioRoutes);
 
 // Inicio del server
 const PORT = 3000;

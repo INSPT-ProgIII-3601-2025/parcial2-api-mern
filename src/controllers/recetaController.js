@@ -14,6 +14,52 @@ exports.getAllRecetas = async (req, res) => {
   }
 };
 
+exports.getAllRecetasPaginated = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({ error: "Página y límite deben ser números positivos" });
+    }
+
+    const totalRecetas = await Receta.countDocuments();
+    const totalPages = Math.ceil(totalRecetas / limit);
+
+    if (page > totalPages && totalPages > 0) {
+      return res.status(400).json({ error: "Página fuera de rango" });
+    }
+
+    const recetas = await Receta.find()
+      .populate('autor_id', 'perfil.nombre perfil.foto')
+      .select('nombre foto instrucciones ingredientes autor_id')
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // Ordenar por fecha de creación descendente
+
+    const recetasFormateadas = recetas.map(receta => ({
+      nombre: receta.nombre,
+      foto: receta.foto,
+      descripcion: receta.instrucciones,
+      ingredientes: receta.ingredientes,
+      autor_id: receta.autor_id
+    }));
+
+    res.json({
+      recetas: recetasFormateadas,
+      pagination: {
+        totalRecetas,
+        totalPages,
+        currentPage: page,
+        limit
+      }
+    });
+  } catch (err) {
+    console.error("Error al obtener recetas paginadas:", err);
+    res.status(500).json({ error: "Error al obtener recetas paginadas" });
+  }
+};
+
 exports.getRecetaById = async (req, res) => {
   try {
     const receta = await Receta.findById(req.params.id)

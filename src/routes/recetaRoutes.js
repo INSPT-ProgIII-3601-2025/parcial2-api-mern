@@ -4,7 +4,8 @@ const router = express.Router();
 const recetaController = require("../controllers/recetaController");
 
 // CRUD
-router.get("/", recetaController.getAllRecetas);
+router.get("/", recetaController.getAllRecetasPaginated);
+router.get("/all", recetaController.getAllRecetas);
 router.get("/:id", recetaController.getRecetaById);
 router.post("/", recetaController.createReceta);
 router.put("/:id", recetaController.updateReceta);

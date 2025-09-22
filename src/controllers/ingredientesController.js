@@ -3,11 +3,47 @@ const Receta = require("../models/recetaModel");
 
 exports.getAll = async (req, res) => {
   try {
-    const ingredientes = await Ingrediente.find();
-    res.json(ingredientes);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({ error: "Página y límite deben ser números positivos" });
+    }
+
+    const totalIngredientes = await Ingrediente.countDocuments();
+    const totalPages = Math.ceil(totalIngredientes / limit);
+
+    if (page > totalPages && totalPages > 0) {
+      return res.status(400).json({ error: "Página fuera de rango" });
+    }
+
+    const ingredientes = await Ingrediente.find()
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // Ordenar por fecha de creación descendente
+
+    res.json({
+      ingredientes,
+      pagination: {
+        totalIngredientes,
+        totalPages,
+        currentPage: page,
+        limit
+      }
+    });
   } catch (err) {
     console.error("Error al obtener ingredientes:", err);
     res.status(500).json({ error: "Error al obtener ingredientes" });
+  }
+};
+
+exports.getAllWithoutLimit = async (req, res) => {
+  try {
+    const ingredientes = await Ingrediente.find();
+    res.json(ingredientes);
+  } catch (err) {
+    console.error("Error al obtener todos los ingredientes:", err);
+    res.status(500).json({ error: "Error al obtener todos los ingredientes" });
   }
 };
 
