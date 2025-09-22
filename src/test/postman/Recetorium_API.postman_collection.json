@@ -1,0 +1,757 @@
+{
+  "info": {
+    "name": "Recetorium API - Complete",
+    "description": "Colección completa de pruebas para la API REST de Recetorium con autenticación JWT, paginación y autorización basada en roles. Incluye endpoints para usuarios, recetas e ingredientes con operaciones CRUD protegidas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "recipe_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Autenticación",
+      "description": "Endpoints para registro y login de usuarios con JWT",
+      "item": [
+        {
+          "name": "Registrar Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mail\": \"usuario@test.com\",\n  \"clave\": \"password123\",\n  \"perfil\": {\n    \"nombre\": \"Usuario Test\",\n    \"foto\": \"https://example.com/foto.jpg\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/usuarios/register",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios", "register"]
+            },
+            "description": "Registra un nuevo usuario en el sistema. Requiere email único, contraseña y perfil con nombre. Respuesta: 201 con datos del usuario creado."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response has user data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('usuario');",
+                  "    pm.expect(jsonData.usuario).to.have.property('id');",
+                  "    pm.collectionVariables.set('user_id', jsonData.usuario.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mail\": \"usuario@test.com\",\n  \"clave\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/usuarios/login",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios", "login"]
+            },
+            "description": "Inicia sesión con email y contraseña. Retorna token JWT válido por 1 hora. Respuesta: 200 con token y datos del usuario."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.collectionVariables.set('jwt_token', jsonData.token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Recetas",
+      "description": "Endpoints para gestionar recetas con autenticación y autorización",
+      "item": [
+        {
+          "name": "Obtener Recetas Paginadas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/recetas?page=1&limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["recetas"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Obtiene recetas paginadas (público). Parámetros: page (default 1), limit (default 10). Respuesta: 200 con array de recetas y metadatos de paginación."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has pagination\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('recetas');",
+                  "    pm.expect(jsonData).to.have.property('pagination');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener Todas las Recetas (sin paginación)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/recetas/all",
+              "host": ["{{base_url}}"],
+              "path": ["recetas", "all"]
+            },
+            "description": "Obtiene todas las recetas sin paginación (público). Respuesta: 200 con array completo de recetas."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener Recetas Paginadas (Endpoint Alternativo)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/recetas/todas?page=1&limit=3",
+              "host": ["{{base_url}}"],
+              "path": ["recetas", "todas"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
+                }
+              ]
+            },
+            "description": "Endpoint alternativo para obtener recetas paginadas con más detalles. Respuesta: 200 con paginación."
+          }
+        },
+        {
+          "name": "Obtener Receta por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/recetas/{{recipe_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["recetas", "{{recipe_id}}"]
+            },
+            "description": "Obtiene detalles completos de una receta por ID (público). Incluye autor poblado e ingredientes. Respuesta: 200 con objeto receta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 404\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has recipe data\", function () {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('nombre');",
+                  "        pm.expect(jsonData).to.have.property('ingredientes');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear Nueva Receta (Requiere Auth)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Torta de Chocolate\",\n  \"foto\": \"torta.jpg\",\n  \"instrucciones\": \"Mezclar ingredientes y hornear a 180°C por 45 minutos\",\n  \"ingredientes\": [\n    {\n      \"ingrediente_id\": \"507f1f77bcf86cd799439011\",\n      \"nombre\": \"Harina\",\n      \"cantidad\": 200,\n      \"unidad_medida\": \"gramos\"\n    },\n    {\n      \"ingrediente_id\": \"507f1f77bcf86cd799439012\",\n      \"nombre\": \"Chocolate\",\n      \"cantidad\": 150,\n      \"unidad_medida\": \"gramos\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/recetas",
+              "host": ["{{base_url}}"],
+              "path": ["recetas"]
+            },
+            "description": "Crea una nueva receta (requiere token JWT). El autor_id se asigna automáticamente del usuario autenticado. Respuesta: 201 con receta creada."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response has created recipe\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('_id');",
+                  "    pm.collectionVariables.set('recipe_id', jsonData._id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar Receta (Requiere Autor/Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Torta de Chocolate Actualizada\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/recetas/{{recipe_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["recetas", "{{recipe_id}}"]
+            },
+            "description": "Actualiza una receta existente. Solo el autor o un ADMIN pueden modificar. Requiere token JWT. Respuesta: 200 con receta actualizada."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has updated recipe\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('nombre');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar Receta (Requiere Autor/Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/recetas/{{recipe_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["recetas", "{{recipe_id}}"]
+            },
+            "description": "Elimina una receta. Solo el autor o un ADMIN pueden eliminar. Requiere token JWT. Respuesta: 200 con mensaje de confirmación."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "description": "Endpoints para gestión de usuarios con autorización",
+      "item": [
+        {
+          "name": "Obtener Lista de Usuarios (Solo ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Obtiene lista paginada de todos los usuarios. Solo accesible para usuarios con rol ADMIN. Requiere token JWT. Respuesta: 200 con lista paginada."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has pagination\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('usuarios');",
+                  "    pm.expect(jsonData).to.have.property('pagination');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener Recetas de un Usuario",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios/{{user_id}}/recetas",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios", "{{user_id}}", "recetas"]
+            },
+            "description": "Obtiene todas las recetas subidas por un usuario específico (público). Respuesta: 200 con array de recetas."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ingredientes",
+      "description": "Endpoints para gestión de ingredientes con paginación",
+      "item": [
+        {
+          "name": "Obtener Ingredientes Paginados",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ingredientes?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["ingredientes"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Obtiene lista paginada de ingredientes (público). Parámetros: page y limit. Respuesta: 200 con array y metadatos de paginación."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has pagination\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('ingredientes');",
+                  "    pm.expect(jsonData).to.have.property('pagination');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener Todos los Ingredientes (sin paginación)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ingredientes/all",
+              "host": ["{{base_url}}"],
+              "path": ["ingredientes", "all"]
+            },
+            "description": "Obtiene todos los ingredientes sin paginación (público). Respuesta: 200 con array completo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener Recetas por Ingrediente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ingredientes/507f1f77bcf86cd799439011/recetas",
+              "host": ["{{base_url}}"],
+              "path": ["ingredientes", "507f1f77bcf86cd799439011", "recetas"]
+            },
+            "description": "Obtiene todas las recetas que contienen un ingrediente específico (público). Respuesta: 200 con array de recetas."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tests de Error y Autorización",
+      "description": "Pruebas para verificar manejo de errores y restricciones de autorización",
+      "item": [
+        {
+          "name": "Acceso sin Token (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Receta sin auth\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/recetas",
+              "host": ["{{base_url}}"],
+              "path": ["recetas"]
+            },
+            "description": "Intenta crear receta sin token JWT. Debe retornar 401 Unauthorized."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Error message about token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.include('Token');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Acceso con Token Inválido (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer token_invalido"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Receta con token inválido\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/recetas",
+              "host": ["{{base_url}}"],
+              "path": ["recetas"]
+            },
+            "description": "Intenta crear receta con token JWT inválido. Debe retornar 403 Forbidden."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Usuario No Admin Accediendo a Lista (403)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios"]
+            },
+            "description": "Usuario regular intenta acceder a lista de usuarios. Debe retornar 403 Forbidden."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Error message about admin\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.include('administrador');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Paginación con Parámetros Inválidos (400)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/recetas?page=-1&limit=0",
+              "host": ["{{base_url}}"],
+              "path": ["recetas"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "-1"
+                },
+                {
+                  "key": "limit",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Intenta paginación con parámetros inválidos. Debe retornar 400 Bad Request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

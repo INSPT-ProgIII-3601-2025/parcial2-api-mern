@@ -75,7 +75,9 @@ exports.getRecetaById = async (req, res) => {
 
 exports.createReceta = async (req, res) => {
   try {
-    const nuevaReceta = new Receta(req.body);
+    // Asignar el autor desde el token JWT (usuario autenticado)
+    const nuevaRecetaData = { ...req.body, autor_id: req.user.id };
+    const nuevaReceta = new Receta(nuevaRecetaData);
     const saved = await nuevaReceta.save();
     res.status(201).json(saved);
   } catch (err) {
@@ -86,8 +88,8 @@ exports.createReceta = async (req, res) => {
 
 exports.updateReceta = async (req, res) => {
   try {
+    // La receta ya fue verificada en el middleware isAuthor y está disponible en req.receta
     const updated = await Receta.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) return res.status(404).json({ error: "Receta no encontrada" });
     res.json(updated);
   } catch (err) {
     console.error("Error al actualizar receta:", err);
@@ -97,8 +99,8 @@ exports.updateReceta = async (req, res) => {
 
 exports.deleteReceta = async (req, res) => {
   try {
+    // La receta ya fue verificada en el middleware isAuthor
     const deleted = await Receta.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ error: "Receta no encontrada" });
     res.json({ message: "Receta eliminada" });
   } catch (err) {
     console.error("Error al eliminar receta:", err);
