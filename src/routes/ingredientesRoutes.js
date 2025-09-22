@@ -1,8 +1,9 @@
-const app = require('express');
+const express = require('express');
 
-const router = app.Router();
-const ingredientesController = require('./../controllers/ingredientesController')
+const router = express.Router();
+const ingredientesController = require('../controllers/ingredientesController');
 
 router.get("/", ingredientesController.getAll);
+router.get("/:id/recetas", ingredientesController.getRecetasByIngrediente);
 
 module.exports = router;

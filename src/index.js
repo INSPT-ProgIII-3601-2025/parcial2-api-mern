@@ -13,11 +13,11 @@ app.use(express.json()); // middleware para...
 connectDB();
 
 // Rutas
-app.use("/recetas", recetaRoutes);
-app.use("/ingredientes", ingredientesRoutes);
+app.use("/api/recetas", recetaRoutes);
+app.use("/api/ingredientes", ingredientesRoutes);
 
 // Inicio del server
-const PORT = 4000;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });

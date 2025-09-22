@@ -8,6 +8,7 @@ const recetaSchema = new mongoose.Schema(
     autor_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
     ingredientes: [
       {
+        _id: false,
         cantidad: { type: Number, required: true },
         unidad_medida: { type: String, required: true },
         nombre: { type: String, required: true },
