@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt")
 
 const getAllUsuarios = (req, res) => {
-  res.status(200).json({ respuesta: "pendiente" });
+  res.status(200).json({ respuesta: "todos los usuarios" });
 };
 
 const getUsuarioById = (req, res) => {
