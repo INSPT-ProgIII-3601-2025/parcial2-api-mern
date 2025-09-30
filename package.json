@@ -19,8 +19,10 @@
   },
   "homepage": "https://github.com/INSPT-ProgIII-3601-2025/parcial2-api-mern#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1"
   }
 }
