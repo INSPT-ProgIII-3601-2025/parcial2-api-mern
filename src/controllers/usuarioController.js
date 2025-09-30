@@ -59,10 +59,10 @@ const loginUsuario = async (req, res) => {
     }
 
     // Verificar contraseña (comparar con hash)
-    /*const isMatch = await bcrypt.compare(clave, usuario.clave);
+    const isMatch = await bcrypt.compare(clave, usuario.clave);
     if (!isMatch) {
       return res.status(400).json({ error: "Contraseña incorrecta" });
-    }*/
+    }
 
     // Generar token JWT
     const token = jwt.sign(
